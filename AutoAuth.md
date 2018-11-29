@@ -134,16 +134,15 @@ If it is willing to grant the token as requested, it generates a token and sends
 
 * `access_token` - the token
 * `token_type: Bearer`
-* `scope` - the scopes for which the token was granted (space-separated list)
-* `base_uri` - the base URI defining the protection space
-* `realm` - the realm if any
 * `state` - the state as submitted by the authorization endpoint in the token request
+* `scope` - the scopes for which the token was granted (space-separated list). *OPTIONAL* if equal to the requested scopes.
+* `expires_in` - time in seconds in which the token expires. *RECOMMENDED*
 
 If it is not willing to grant the token, it sends an OAuth 2.0 error message to the Callback URL instead, also adding the `state` parameter. 
 
 ## External Token Callback 
 
-If the token was successfully obtained, the callback to the client has the same structure as the Access Token Callback, but of course uses the `state` parameter value submitted by the client in the External Token Request.
+If the token was successfully obtained, the callback to the client has the same structure as the Access Token Callback, but of course uses the `state` parameter value submitted by the client in the External Token Request. 
 
 In case of an error, the error response is passed through, with the `state` parameter added.
 
