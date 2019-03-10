@@ -155,21 +155,104 @@ response_type=external_token
 &callback_url=https://client.example/callbacks
 ```
 
-#### Response
+##### Response
 
 If the authorization endpoint accepts the request by the client, it returns a HTTP `202 Accepted` response. Otherwise, it returns an OAuth 2.0 error.
 
-### Obtaining the Token
+#### Obtaining the Token
 
 The authorization endpoint now goes through the flow as described above and obtains a token. If it receives an error at any step, it POSTs it to the callback_url, with the state parameter added.
 
-
-
-### External Token Callback 
+#### External Token Callback 
 
 If the token was successfully obtained, the callback to the client contains the same information as the Access Token Callback, but with the `state` parameter value submitted by the client in the External Token Request, and additionally the `base_uri` and `realm` the token is for.
 
 The client can now use the token to make queries.
+
+### Polling-based Flow
+
+Alternatively, the client can poll for information. This is especially relevant if the client is a client-side application on the user's device that is not able to provide a publicly available callback URL.
+
+The polling mechanism in this flow is closely based on the OAuth2 Device Flow.
+
+#### External Token Request
+
+(Identical to callback flow, except there is no callback URL and no state)
+
+When the client wants to request a token for a resource, it sends a request to the Authorization Endpoint to obtain one. The client makes a POST request to the authorization endpoint with an authorization header containing its token and the following parameters:
+
+- `response_type=external_token`
+- `target_url`- the URL of the resource for which to obtain the token
+- `scope` - A space-separated list of scopes the client is requesting, e.g. "read". The client must be authorized to request each of the scopes, by having a matching `request_token` scope itself.
+
+```http
+POST https://user.example/auth
+Authorization: Bearer CLIENT_TOKEN
+Content-Type: application/x-www-form-urlencoded
+Accept: application/json
+
+response_type=external_token
+&target_url=https://example.org/resource
+&state=1234567890
+&scope=read
+```
+
+##### Response
+
+If the authorization endpoint accepts the request by the client, it returns a HTTP `200 OK` response containing
+
+* `request_id`- a randomly chosen unique ID by which the server can match later polling to the request. Note that this takes the security role of `state` and has to be private and unguessable.
+
+* `interval` - *OPTIONAL* polling interval in seconds. 
+
+  ```http
+  HTTP/1.1 200 OK
+  Content-Type: application/json
+  
+  {
+      "request_id": "abcdefg",
+      "interval": 5
+  }
+  ```
+
+Otherwise, it returns an OAuth 2.0 error.
+
+#### Obtaining the Token
+
+The authorization endpoint now obtains the token as above. Once the process is complete, it provides the client with the details when it polls the next time.
+
+#### Polling
+
+The client regularly polls the authorization endpoint with requests including the following parameters:
+
+* `request_id`- the request id it got assigned in the response to the External Token Request
+
+If the access token is available, the authorization endpoint returns the information to the client. It includes the data it received through the the Access Token Callback, excluding the `state` and adding the `realm` and `base_uri`. If it is not available, the responses are the same as in the OAuth2 Device Flow: https://tools.ietf.org/html/draft-ietf-oauth-device-flow-14#section-3.5
+
+Most notably, the new error codes are:
+
+```
+   authorization_pending
+      The authorization request is still pending as the end user hasn't
+      yet completed the user interaction steps (Section 3.3).  The
+      client SHOULD repeat the Access Token Request to the token
+      endpoint (a process known as polling).  Before each new request
+      the client MUST wait at least the number of seconds specified by
+      the "interval" parameter of the Device Authorization Response (see
+      Section 3.2), or 5 seconds if none was provided, and respect any
+      increase in the polling interval required by the "slow_down"
+      error.
+
+   slow_down
+      A variant of "authorization_pending", the authorization request is
+      still pending and polling should continue, but the interval MUST
+      be increased by 5 seconds for this and all subsequent requests.
+
+   access_denied
+      The end user denied the authorization request.
+```
+
+
 
 ## Privacy Considerations
 
