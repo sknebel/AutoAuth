@@ -6,7 +6,7 @@ AutoAuth (working title) is an extension to IndieAuth to allow clients to obtain
 
 
 
-### Participants
+## Participants
 
 * User: the end user.
 * Authorization Endpoint: Authorization Endpoint on the user's URL. 
