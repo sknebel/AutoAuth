@@ -165,7 +165,7 @@ The authorization endpoint now goes through the flow as described above and obta
 
 #### External Token Callback 
 
-If the token was successfully obtained, the callback to the client contains the same information as the Access Token Callback, but with the `state` parameter value submitted by the client in the External Token Request, and additionally the `base_uri` and `realm` the token is for.
+If the token was successfully obtained, the callback to the client contains the same information as the Access Token Callback, but with the `state` parameter value submitted by the client in the External Token Request, and the `realm` the token is for added.
 
 The client can now use the token to make queries.
 
@@ -227,7 +227,7 @@ The client regularly polls the authorization endpoint with requests including th
 
 * `request_id`- the request id it got assigned in the response to the External Token Request
 
-If the access token is available, the authorization endpoint returns the information to the client. It includes the data it received through the the Access Token Callback, excluding the `state` and adding the `realm` and `base_uri`. If it is not available, the responses are the same as in the OAuth2 Device Flow: https://tools.ietf.org/html/draft-ietf-oauth-device-flow-14#section-3.5
+If the access token is available, the authorization endpoint returns the information to the client. It includes the data it received through the the Access Token Callback, excluding the `state` and adding the `realm`. If it is not available, the responses are the same as in the OAuth2 Device Flow: https://tools.ietf.org/html/draft-ietf-oauth-device-flow-14#section-3.5
 
 Most notably, the new error codes are:
 
