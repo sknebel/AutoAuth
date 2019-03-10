@@ -87,8 +87,8 @@ Note that this request is not yet verified to actually be from the user's author
 
 ### Authorization Code Verification Request
 
-The token endpoint needs to verify that the authorization code is valid and that it was issued for the matching parameters.
-It discovers the authorization endpoint from the user's page (`me`) and compares it's url with the `client_id`. If it is equal, it sends it a verification request containing the `code`, `me`, `root_uri`, `realm` (if one was requested), `scope` and `callback_url` parameters.
+The token endpoint needs to verify that the authorization code is valid and that it was issued for the matching parameters. For this, it discovers the authorization endpoint from the user's page (`me`). Discovery works [like in IndieAuth](https://indieauth.spec.indieweb.org/#discovery-by-clients), except that the `me` value can not change: Permanent redirects (`301`, `308`) are *NOT* allowed. It then checks that the URL found for the authorization endpoint is equal to `client_id`. If it is equal, it sends it a verification request containing the `code`, `me`, `root_uri`, `realm` (if one was requested), `scope` and `callback_url` parameters.
+
 ```http
 POST https://user.example/auth
 Content-Type: x-www-form-urlencoded
