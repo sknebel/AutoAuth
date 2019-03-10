@@ -45,7 +45,7 @@ Following OAuth 2.0, all exchanges unless noted otherwise happen through POST re
 
 ## Obtaining an Access Token for the Resource
 
-The guardian of the user's identity in IndieAuth is the authorization endpoint. It is tasked here with obtaining tokens for the resource. The owner of the resource will need a confirmation that request is made at the behest of the user, and the authorization endpoint is able to provide this very similarly to how it confirms the identity in IndieAuth
+The guardian of the user's identity in IndieAuth is the authorization endpoint. It is tasked here with obtaining tokens for the resource. The owner of the resource will need a confirmation that request is made at the behest of the user, and the authorization endpoint is able to provide this very similarly to how it confirms the identity in IndieAuth.
 
 ### Token Request
 
@@ -105,7 +105,7 @@ The authorization endpoint will validate that the code corresponds with the give
 
 ### Access Token Callback 
 
-If the verification was sucessful, the token endpoint can now assume the request is genuine.
+If the verification was successful, the token endpoint can now assume the request is genuine.
 
 If it is willing to grant the token as requested, it generates a token and sends it to the Callback URL using a POST request. Its parameters are: 
 
@@ -125,18 +125,20 @@ The token can now be used to request the resource. It is included in an `Authori
 
 The above describes how a token can be obtained, but does not prescribe how applications requiring tokens can communicate with the authorization endpoint to trigger this flow. This section adds these pieces to allow applications that are not tightly integrated with the authorization endpoint to obtain tokens through a standardized and safe mechanism. Since all tokens pass through the authorization endpoint, it can keep a record of them and the user can always use them to request revocation at the resource, without the client application cooperating.
 
-## Granting Token-Request Permission to the Client
+### Granting Token-Request Permission to the Client
 
 The Client application can obtain a token authorizing it to make requests for tokens for external resources through an IndieAuth authorization flow. It requests scopes prefixed with `request_external_token`, i.e. to obtain permission to request tokens with `read` scope, it requires a scope of `request_external_token:read`. 
 
-### External Token Request
+### Callback-based Flow
+
+#### External Token Request
 
 When the client wants to request a token for a resource, it sends a request to the Authorization Endpoint to obtain one. The client makes a POST request to the authorization endpoint with an authorization header containing its token and the following parameters:
 
 - `response_type=external_token`
 - `target_url`- the URL of the resource for which to obtain the token
 - `state` - a randomly chosen spoofing-protection parameter which will be included in the callback
-- `scope` - A space-separated list of scopes the client is requesting, e.g. "read". The client must be authorized to request each of the scopes, by having a matching `request_token` scope itself.
+- `scope` - A space-separated list of scopes the client is requesting, e.g. "read". The client must be authorized to request each of the scopes, by having a matching `request_external_token:` scope itself.
 - `callback_url`- the URL on which the client wants to receive the token
 
 ```http
