@@ -80,9 +80,10 @@ grant_type=authorization_code
 #### Response
 
 If the token endpoint agrees to proceed with the process,  the token endpoint returns a HTTP `202 Accepted` response. Otherwise, it returns an OAuth 2.0 error.
+
+The token endpoint can choose to continue the process synchronously, so the authorization code verification and even the callback can happen *before* this request returns. 
+
 Note that this request is not yet verified to actually be from the user's authorization endpoint, so aborting here should only happen in cases where no sensitive information is revealed. E.g. it is safe to return an error if the protection space is unknown or never granted access to, but user-specific decisions could reveal sensitive information and thus should not be made here. 
-
-
 
 ### Authorization Code Verification Request
 
