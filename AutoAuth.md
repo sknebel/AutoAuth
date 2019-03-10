@@ -223,7 +223,7 @@ The authorization endpoint now obtains the token as above. Once the process is c
 
 #### Polling
 
-The client regularly polls the authorization endpoint with requests including the following parameters:
+The client regularly polls the authorization endpoint with requests including its token and the following parameters:
 
 * `request_id`- the request id it got assigned in the response to the External Token Request
 
