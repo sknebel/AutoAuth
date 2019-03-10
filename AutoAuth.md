@@ -41,7 +41,7 @@ The Client application can obtain a token authorizing it to make requests for to
 
 ## General Notes about Requests
 
-Following OAuth 2.0, all exchanges unless noted otherwise happen through POST requests with form-encoded payloads and with JSON response types. Applications SHOULD use the appropriate `Content-Type` and `Accept` headers to indicate this.
+Following OAuth 2.0, all exchanges unless noted otherwise happen through POST requests with form-encoded payloads and JSON response types. Applications SHOULD use the appropriate `Content-Type` and `Accept` headers to indicate this.
 
 ## External Token Request
 
@@ -67,7 +67,7 @@ response_type=external_token
 
 ### Response
 
-If the authorization endpoint accepts the request by the client, it returns a HTTP `200` response. Otherwise, it returns an OAuth 2.0 error.
+If the authorization endpoint accepts the request by the client, it returns a HTTP `202 Accepted` response. Otherwise, it returns an OAuth 2.0 error.
 
 ## Token Request
 
@@ -101,9 +101,9 @@ grant_type=authorization_code
 
 ### Response
 
-If the it agrees to proceed with the process,  the token endpoint returns a HTTP `200` response. Otherwise, it returns an OAuth 2.0 error.
-Note that this request is not yet authenticated to actually be from the auth endpoint of the user it claims to be from, so aborting here should only happen in cases where no sensitive information is revealed. E.g. it is safe to return an error if the protection space is unknown or never granted access to, but user-specific decisions could reveal sensitive information and thus should not be made here. 
-If there is an error returned, the authorization endpoint informs the client of the error through the External Token Callback. 
+If the token endpoint agrees to proceed with the process,  the token endpoint returns a HTTP `202 Accepted` response. Otherwise, it returns an OAuth 2.0 error.
+Note that this request is not yet verified to actually be from the user's auth endpoint, so aborting here should only happen in cases where no sensitive information is revealed. E.g. it is safe to return an error if the protection space is unknown or never granted access to, but user-specific decisions could reveal sensitive information and thus should not be made here. 
+If an error is returned, the authorization endpoint informs the client of the error through the External Token Callback. 
 
 
 
@@ -142,19 +142,19 @@ If it is not willing to grant the token, it sends an OAuth 2.0 error message to 
 
 ## External Token Callback 
 
-If the token was successfully obtained, the callback to the client has the same structure as the Access Token Callback, but of course uses the `state` parameter value submitted by the client in the External Token Request. 
+If the token was successfully obtained, the callback to the client contains the same information as the Access Token Callback, but with the `state` parameter value submitted by the client in the External Token Request, and additionally the `base_uri` and `realm` the token is for.
 
 In case of an error, the error response is passed through, with the `state` parameter added.
 
 ## Accessing the Protected Resource
 
-The client can now use the token to request the resource. It includes an `Authorization`header with the `Bearer` HTTP authorization scheme and the token.
+The client can now use the token to request the resource. It includes an `Authorization` header with the `Bearer` HTTP authorization scheme and the token.
 
 ## Privacy Considerations
 
 To allow the user to restrict future access of the client, token endpoints MUST support token revocation. Authorization endpoints MUST keep records of tokens issued, and allow the user to revoke them. Systems that integrate the User's Token and Authorization endpoints SHOULD automatically revoke tokens that have been obtained with the Client's credentials if the Client's token is revoked (either by the user, or through Token Revocation)
 
-Authorization Endpoints are encouraged to allow further restrictions of the power of a granted token, e.g. to specific domains.
+Authorization endpoints are encouraged to allow further restrictions of the power of a granted token, e.g. to specific domains.
 
 Fetching a file with authorization for the user clearly links the request to the user. Clients should not make such requests unexpectedly, even when they have been granted permission to do so in general. Example: a feed reader should not automatically complete the AutoAuth flow for all feeds that prompt for authorization, but initially ask the user about this.
 
